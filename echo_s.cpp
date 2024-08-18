@@ -3,7 +3,6 @@
 // * -- Accepts TCP connections and then echos back each string sent.
 // **************************************************************************************
 #include "echo_s.h"
-bool VERBOSE;
 
 
 // **************************************************************************************
@@ -48,7 +47,7 @@ int main (int argc, char *argv[]) {
   // * Process the command line arguments
   // ********************************************************************
   int opt = 0;
-  while ((opt = getopt(argc,argv,"v")) != -1) {
+  while ((opt = getopt(argc,argv,"d:")) != -1) {
     
     switch (opt) {
     case 'd':
@@ -66,8 +65,7 @@ int main (int argc, char *argv[]) {
   // * Creating the inital socket is the same as in a client.
   // ********************************************************************
   int     listenFd = -1;
-       // Call socket() to create the socket you will use for lisening.
-  DEBUG << "Calling Socket() assigned file descriptor " << listenFd << ENDL;
+  // Call socket() to create the socket you will use for lisening.
 
   
   // ********************************************************************
@@ -77,12 +75,10 @@ int main (int argc, char *argv[]) {
   // * which IP address and port to lisen for connections.
   // ********************************************************************
   struct sockaddr_in servaddr;
-  srand(time(NULL));
-  u_int16_t port = (rand() % 10000) + 1024;
   memset(&servaddr, 0, sizeof(servaddr));
-  servaddr.sin_family = AF_INET;
-  servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-  servaddr.sin_port = htons(port);
+
+  // *** assign 3 fields in the servadd struct sin_family, sin_addr.s_addr and sin_port
+  // *** the value your port can be any value > 1024.
 
 
   // ********************************************************************
@@ -90,13 +86,13 @@ int main (int argc, char *argv[]) {
   // * specified in the servaddr structure.  This step is implicit in
   // * the connect() call, but must be explicitly listed for servers.
   // ********************************************************************
-  DEBUG << "Calling bind(" << listenFd << "," << &servaddr << "," << sizeof(servaddr) << ")" << ENDL;
   bool bindSuccesful = false;
   while (!bindSuccesful) {
+    // ** Call bind()
     // You may have to call bind multiple times if another process is already using the port
     // your program selects.
   }
-  std::cout << "Using port: " << port << std::endl;
+  // *** DON'T FORGET TO PRINT OUT WHAT PORT YOUR SERVER PICKED SO YOU KNOW HOW TO CONNECT.
 
 
   // ********************************************************************
@@ -105,8 +101,7 @@ int main (int argc, char *argv[]) {
   // * connections and starts the kernel listening for connections.
   // ********************************************************************
   int listenQueueLength = 1;
-  DEBUG << "Calling listen(" << listenFd << "," << listenQueueLength << ")" << ENDL;
- 
+  // ** Cal listen()
 
   // ********************************************************************
   // * The accept call will sleep, waiting for a connection.  When 
@@ -117,17 +112,14 @@ int main (int argc, char *argv[]) {
   while (!quitProgram) {
     int connFd = 0;
 
-    DEBUG << "Calling accept(" << listenFd << "NULL,NULL)." << ENDL;
-
-    // The accept() call checks the listening queue for connection requests.
+    // Call the accept() call to check the listening queue for connection requests.
     // If a client has already tried to connect accept() will complete the
     // connection and return a file descriptor that you can read from and
     // write to. If there is no connection waiting accept() will block and
     // not return until there is a connection.
+    // ** call accept() 
     
-    DEBUG << "We have recieved a connection on " << connFd << ENDL;
-
-    
+    // Now we have a connection, so you can call processConnection() to do the work.
     quitProgram = processConnection(connFd);
    
     close(connFd);
